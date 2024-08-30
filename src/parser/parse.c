@@ -16,7 +16,7 @@ void RemoveHash(char Line[])
         memmove(Line, Line + SUB_HEADING_SIZE, strlen(Line) - TERMINATOR);
 }
 
-void Parse(char Line[])
+void Parse(char Line[], const char FILE_PATH[])
 {
     char StartTag[] = "<h1>";
     char EndTag[] = "</h1>";
@@ -34,6 +34,9 @@ void Parse(char Line[])
 
         char* Final = AddTags(Prepend, EndTag, 'a');
 
-        Transpile(Final);
+        Transpile(Final, FILE_PATH);
     }
+
+    else
+        Transpile(Line, FILE_PATH);
 }
