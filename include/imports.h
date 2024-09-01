@@ -7,7 +7,8 @@ char* FileHandler(const char FILE_PATH[], FILE* File, char String[], const char 
 char* AddTags(char Line[], const char Tag[], int Mode);
 
 void FileManager(char FilePath[], char String[], const char Mode[]);
+void ParseMarkdown(char Line[], const char FILE_PATH[]);
 void Transpile(char String[], const char FILE_PATH[]);
-void Parse(char Line[], const char FILE_PATH[]);
+void ParseJson(const char FILE_PATH[], int Mode);
 
 #endif //IMPORTS_H
