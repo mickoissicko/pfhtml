@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void MoveString(char String[], size_t Length)
 {
@@ -19,58 +20,34 @@ void RemoveKey(char Line[], char Tag[])
             MoveString(Line, strlen("## "));
 }
 
-void WriteHTML(
+int WriteHTML(
     char Line[],
     const char FILE_PATH[],
     char TagStart[],
     char TagEnd[],
-    const int ESCAPE_TAG,
-    const int RAW_TAG,
+    const char RAW_TAG[],
     char Tag[]
 ){
-    // Line = String we are checking inside
-    // FILE_PATH = File to write to
-    // ESCAPE_LIMIT = Escaped Tag we don't want to check for
-    // ESCAPE_TAG = Escaped Tag we are excluding
-    // RAW_LIMIT = Tag we don't want to check for
-    // RAW_TAG = Tag we need to replace
-    // Tag = Tag to target
-    // TagStart = HTML tag start
-    // TagEnd = HTML tag end
+    if (
+        strncmp(Line, RAW_TAG, strlen(RAW_TAG)) == 0
+    ){
+        RemoveKey(Line, Tag);
 
+        char* Prepend = AddTags(Line, TagStart, 'p');
 
+        Prepend[strcspn(Prepend, "\n")] = '\0';
+
+        char* Final = AddTags(Prepend, TagEnd, 'a');
+
+        Transpile(Final, FILE_PATH);
+
+        return EXIT_SUCCESS;
+    }
+
+    return EXIT_FAILURE;
 }
 
 void Parse(char Line[], const char FILE_PATH[])
 {
-    if (
-        strncmp(Line, "# ", strlen("# ")) == 0
-    ){
-        RemoveKey(Line, "#");
-
-        char* Prepend = AddTags(Line, "<h1>", 'p');
-
-        Prepend[strcspn(Prepend, "\n")] = '\0';
-
-        char* Final = AddTags(Prepend, "</h1>", 'a');
-
-        Transpile(Final, FILE_PATH);
-    }
-
-    else if (
-        strncmp(Line, "## ", strlen("## ")) == 0
-    ){
-        RemoveKey(Line, "##");
-
-        char* Prepend = AddTags(Line, "<h2>", 'p');
-
-        Prepend[strcspn(Prepend, "\n")] = '\0';
-
-        char* Final = AddTags(Prepend, "</h2>", 'a');
-
-        Transpile(Final, FILE_PATH);
-    }
-
-    else
-        Transpile(Line, FILE_PATH);
+    // TODO: make reader & parser
 }
