@@ -9,7 +9,7 @@
 
 char* FileHandler(const char FILE_PATH[], FILE* File, char String[], const char Mode[])
 {
-    size_t MAX_LINE_LENGTH = 2048;
+    const int MAX_LINE_LENGTH = 2048;
 
     char* Line = (char*)malloc(sizeof(char) * MAX_LINE_LENGTH);
 
@@ -21,7 +21,7 @@ char* FileHandler(const char FILE_PATH[], FILE* File, char String[], const char 
 
         FILE* Path = fopen(PATH_FILE, "w");
 
-        int Max = strlen(FilePath);
+        size_t Max = strlen(FilePath);
         int Index = 0;
 
         while (Index < (Max - strlen(".md")))
@@ -47,10 +47,10 @@ char* FileHandler(const char FILE_PATH[], FILE* File, char String[], const char 
             exit(1);
         }
 
-        //
+        fprintf(File, "%s", String);
     }
 
-    return Line;
+    return 0;
 }
 
 void FileManager(char FilePath[], char String[], const char Mode[])
