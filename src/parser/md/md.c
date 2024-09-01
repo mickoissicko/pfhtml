@@ -1,8 +1,9 @@
 #include "../../../include/imports.h"
 
+#include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #define MAX_LINE_LENGTH 1024
 
@@ -17,13 +18,53 @@ void RemoveKey(char Line[], char Tag[])
         MoveString(Line, strlen(Tag));
 }
 
-int WriteHTML(
+char* WriteHTML(
     char Line[],
-    const char FILE_PATH[],
     char TagStart[],
     char TagEnd[],
     char Tag[]
 ){
+    static char Result[MAX_LINE_LENGTH];
+
+    if (strcmp(Tag, "*") == 0)
+    {
+        char EscapeTag[(strlen(Tag) + 1)];
+
+        int Index = 0, Cursor = 0;
+        int TagCount = 0;
+
+        snprintf(EscapeTag, sizeof(EscapeTag), "\\%s", Tag);
+
+        while (Line[Index] != '\0')
+        {
+            if (Line[Index] == '*' && (Index == 0 || Line[Index - 1] != '\\'))
+            {
+                if (TagCount)
+                    Result[Cursor++] = '<',
+                    Result[Cursor++] = '/',
+                    Result[Cursor++] = 'e',
+                    Result[Cursor++] = 'm',
+                    Result[Cursor++] = '>',
+                    TagCount = 0;
+
+                else
+                    Result[Cursor++] = '<',
+                    Result[Cursor++] = 'e',
+                    Result[Cursor++] = 'm',
+                    Result[Cursor++] = '>',
+                    TagCount = 1;
+
+                Index++;
+            }
+
+            else
+                Result[Cursor++] = Line[Index++];
+        }
+
+        Result[Cursor] = '\0';
+        return Result;
+    }
+
     char RawTag[(strlen(Tag)) + 2];
     snprintf(RawTag, sizeof(RawTag), "%s ", Tag);
 
@@ -32,23 +73,21 @@ int WriteHTML(
         RemoveKey(Line, RawTag);
 
         char* Prepend = AddTags(Line, TagStart, 'p');
-
         Prepend[strcspn(Prepend, "\n")] = '\0';
 
         char* Final = AddTags(Prepend, TagEnd, 'a');
-
-        Transpile(Final, FILE_PATH);
-
-        return EXIT_SUCCESS;
+        strncpy(Result, Final, MAX_LINE_LENGTH);
+        return Result;
     }
 
-    return EXIT_FAILURE;
+    return Line;
 }
 
-void InsertBreaks(char Escape[], int Symbol, char Tag[], char Line[], const char FILE_PATH[])
-{
-    // if Line has $ but not \$, proceed
-
+void InsertBreaks(
+    int Symbol,
+    char Tag[],
+    char Line[]
+){
     char Result[MAX_LINE_LENGTH];
 
     char* Cursor = Line;
@@ -89,14 +128,16 @@ void DeleteBackslashes(char Line[])
 
 void ParseMarkdown(char Line[], const char FILE_PATH[])
 {
-    InsertBreaks("\\$", '$', "<br>", Line, FILE_PATH);
+    InsertBreaks('$', "<br>", Line);
 
-    if (strchr(Line, '\\') != NULL)
-        DeleteBackslashes(Line);
+    char* Format;
 
-    // yea.. idk either man
-    if (WriteHTML(Line, FILE_PATH, "<h1>", "</h1>", "#") != 0)
-        if (WriteHTML(Line, FILE_PATH, "<h2>", "</h2>", "##") != 0)
-            if (WriteHTML(Line, FILE_PATH, "<ul><li>", "</li></ul>", ">") != 0)
-                Transpile(Line, FILE_PATH);
+    Format = WriteHTML(Line, "<h1>", "</h1>", "#");
+    Format = WriteHTML(Format, "<h2>", "</h2>", "##");
+    Format = WriteHTML(Format, "<ul><li>", "</li></ul>", ">");
+    Format = WriteHTML(Format, "<em>", "</em>", "*");
+
+    DeleteBackslashes(Format);
+
+    Transpile(Format, FILE_PATH);
 }
