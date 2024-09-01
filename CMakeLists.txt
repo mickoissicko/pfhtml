@@ -10,7 +10,7 @@ add_executable(pfhtml
         src/main.c
         src/files.c
         include/imports.h
-        src/parser/parse.c
+        src/parser/md/md.c
         src/parser/addtags.cpp
         src/parser/transpile.c
 )
