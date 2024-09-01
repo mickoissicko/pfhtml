@@ -36,7 +36,7 @@ char* FileHandler(const char FILE_PATH[], FILE* File, char String[], const char 
         FinalFilePath[strcspn(FinalFilePath, "\n")] = '\0';
 
         while (fgets(Line, MAX_LINE_LENGTH, File) != NULL)
-            Parse(Line, FinalFilePath);
+            ParseMarkdown(Line, FinalFilePath);
     }
 
     else
