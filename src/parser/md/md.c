@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const static int True = 1;
+
 void MoveString(char String[], size_t Length)
 {
     memmove(String, String + Length, strlen(String) - Length);
@@ -11,13 +13,8 @@ void MoveString(char String[], size_t Length)
 
 void RemoveKey(char Line[], char Tag[])
 {
-    if (strcmp(Tag, "#") == 0)
-        if (strncmp(Line, "# ", strlen("# ")) == 0)
-            MoveString(Line, strlen("# "));
-
-    if (strcmp(Tag, "##") == 0)
-        if (strncmp(Line, "## ", strlen("## ")) == 0)
-            MoveString(Line, strlen("## "));
+    if (strncmp(Line, Tag, strlen(Tag)) == 0)
+        MoveString(Line, strlen(Tag));
 }
 
 int WriteHTML(
@@ -25,13 +22,14 @@ int WriteHTML(
     const char FILE_PATH[],
     char TagStart[],
     char TagEnd[],
-    const char RAW_TAG[],
     char Tag[]
 ){
-    if (
-        strncmp(Line, RAW_TAG, strlen(RAW_TAG)) == 0
-    ){
-        RemoveKey(Line, Tag);
+    char RawTag[(strlen(Tag)) + 2];
+    snprintf(RawTag, sizeof(RawTag), "%s ", Tag);
+
+    if (strncmp(Line, RawTag, strlen(RawTag)) == 0)
+    {
+        RemoveKey(Line, RawTag);
 
         char* Prepend = AddTags(Line, TagStart, 'p');
 
@@ -47,7 +45,12 @@ int WriteHTML(
     return EXIT_FAILURE;
 }
 
-void Parse(char Line[], const char FILE_PATH[])
+void ParseMarkdown(char Line[], const char FILE_PATH[])
 {
-    // TODO: make reader & parser
+    // yea.. idk either man
+
+    if (WriteHTML(Line, FILE_PATH, "<h1>", "</h1>", "#") != 0)
+        if (WriteHTML(Line, FILE_PATH, "<h2>", "</h2>", "##") != 0)
+            if (WriteHTML(Line, FILE_PATH, "<ul><li>", "</li></ul>", ">") != 0)
+                Transpile(Line, FILE_PATH);
 }
