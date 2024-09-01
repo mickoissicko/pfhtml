@@ -10,5 +10,6 @@ void FileManager(char FilePath[], char String[], const char Mode[]);
 void ParseMarkdown(char Line[], const char FILE_PATH[]);
 void Transpile(char String[], const char FILE_PATH[]);
 void ParseJson(const char FILE_PATH[], int Mode);
+void DeleteBackslashes(char Line[]);
 
 #endif //IMPORTS_H
